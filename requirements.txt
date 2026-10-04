@@ -3,3 +3,4 @@ requests
 pyotp
 python-dotenv
 smartapi-python
+logzero
