@@ -1,0 +1,51 @@
+name: UC RADAR - 10 Minute Scanner
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 09:15, 09:25, ... 09:55 IST, Monday-Friday
+    - cron: '15-55/10 9 * * 1-5'
+      timezone: 'Asia/Kolkata'
+
+    # 10:05, 10:15, ... 14:55 IST, Monday-Friday
+    - cron: '5-55/10 10-14 * * 1-5'
+      timezone: 'Asia/Kolkata'
+
+    # 15:05, 15:15, 15:25 IST, Monday-Friday
+    - cron: '5-25/10 15 * * 1-5'
+      timezone: 'Asia/Kolkata'
+
+concurrency:
+  group: uc-radar-scanner
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      ANGEL_API_KEY: ${{ secrets.ANGEL_API_KEY }}
+      ANGEL_CLIENT_CODE: ${{ secrets.ANGEL_CLIENT_CODE }}
+      ANGEL_PASSWORD: ${{ secrets.ANGEL_PASSWORD }}
+      ANGEL_TOTP_SECRET: ${{ secrets.ANGEL_TOTP_SECRET }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run UC RADAR
+        run: python UC_RADAR_GitHub_10min.py
