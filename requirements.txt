@@ -1,0 +1,5 @@
+pandas
+requests
+pyotp
+python-dotenv
+smartapi-python
